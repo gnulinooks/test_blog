@@ -1,10 +1,11 @@
 tasks:
-  build-deps:
+  build:
     runner: razorci/ruby
     steps:
-    - docker-build:
-      image: razorci/docs
-      push: true
-      tags: ["${CI_COMMIT_SHA}", "latest"]
-      dockerfile: Dockerfile
-      context: .
+    - checkout
+    - docker/build:
+        image: quay.io/gnulinooks/demo
+        push: true
+        tags: ["${CI_COMMIT_SHA}", "latest"]
+        dockerfile: Dockerfile
+        context: .

@@ -1,18 +1,29 @@
-FROM ruby:2.6.3-stretch
+FROM ruby:2.5
 
-MAINTAINER vinay@codecrux.com
+RUN apt-get update -qq \
+    && apt-get -y install apt-transport-https apt-utils curl \
+    && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
+    && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
+    && curl -sL https://deb.nodesource.com/setup_10.x | bash -
 
-RUN apt-get update && apt-get install -qq -y --no-install-recommends build-essential nodejs libpq-dev
+RUN apt-get update -qq \
+    && apt-get install -y build-essential libpq-dev nodejs yarn \
+      # remove useless files from the current layer
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /var/lib/apt/lists.d/* \
+    && apt-get autoremove \
+    && apt-get clean \
+    && apt-get autoclean
+    
+ENV RAILS_ENV production
+COPY gems /app/gems
+COPY Gemfile /app/Gemfile
+COPY Gemfile.lock /app/Gemfile.lock
 
-ENV RAILS_ENV=production RACK_ENV=production SECRET_KEY_BASE=xpto APP_HOME=/app/
+RUN cd /app && bundle install --without test development
 
-ADD Gemfile* $APP_HOME
-RUN cd $APP_HOME && bundle install --without development test --jobs 2
+WORKDIR /app
+COPY . /app
 
-ADD ./ $APP_HOME
-WORKDIR $APP_HOME
-
-RUN RAILS_GROUPS=assets bundle exec rake assets:precompile
-
-
-CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
+RUN SECRET_KEY_BASE=foobar STRIPE_SECRET_KEY=foobar RAILS_GROUPS=assets \
+    bundle exec rake assets:precompile

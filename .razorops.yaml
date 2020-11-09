@@ -3,6 +3,7 @@ tasks:
     runner: razorci/ruby
     steps:
     - checkout
+    - run: cat Dockerfile
     - docker/build:
         image: quay.io/gnulinooks/demo
         push: true

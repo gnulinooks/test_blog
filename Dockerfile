@@ -16,7 +16,6 @@ RUN apt-get update -qq \
     && apt-get autoclean
     
 ENV RAILS_ENV production
-COPY gems /app/gems
 COPY Gemfile /app/Gemfile
 COPY Gemfile.lock /app/Gemfile.lock
 

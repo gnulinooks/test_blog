@@ -1,12 +1,7 @@
 tasks:
-  build:
+  build-deps:
     runner: razorci/ruby
     steps:
-    - checkout
-    - run: cat Dockerfile
-    - docker/build:
-        image: quay.io/gnulinooks/demo
-        push: true
-        tags: ["${CI_COMMIT_SHA}", "latest"]
-        dockerfile: Dockerfile
-        context: .
+    - commands:
+      - bundle install || bundle check
+      - bundle exec rspec

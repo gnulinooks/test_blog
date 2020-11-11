@@ -2,7 +2,7 @@ tasks:
   build-deps:
     runner: razorci/ruby
     steps:
-    - run: bundle update --bundler
+    - run: bundle update --bundler && bundle install
     - commands:
-      - bundle install || bundle check
+      - bundle check
       - bundle exec test
